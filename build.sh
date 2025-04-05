@@ -11,3 +11,5 @@ mkdir -p build
 cd build
 cmake .. -DRENDER_BACKEND=$RENDER_BACKEND
 make -j$(nproc)
+cp compile_commands.json ../
+cd ..
