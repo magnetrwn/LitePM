@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../liblitepm_core.a CMakeFiles/litepm_core.dir/wm.c.o
-/usr/bin/ranlib ../liblitepm_core.a

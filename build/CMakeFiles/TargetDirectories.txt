@@ -1,6 +1,0 @@
-/home/eye/Developer/litepm/build/CMakeFiles/edit_cache.dir
-/home/eye/Developer/litepm/build/CMakeFiles/rebuild_cache.dir
-/home/eye/Developer/litepm/build/src/CMakeFiles/litepm_core.dir
-/home/eye/Developer/litepm/build/src/CMakeFiles/litepm_demo.dir
-/home/eye/Developer/litepm/build/src/CMakeFiles/edit_cache.dir
-/home/eye/Developer/litepm/build/src/CMakeFiles/rebuild_cache.dir
