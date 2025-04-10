@@ -20,10 +20,10 @@ typedef struct {
     };
 } WindowEvent;
 
-typedef struct {
+typedef struct _Window {
     int x, y, w, h;
-    void (*draw)(struct Window* self);
-    void (*give)(struct Window* self, WindowEvent* evt);
+    void (*draw)(struct _Window* self);
+    void (*handle)(struct _Window* self, WindowEvent* evt);
 } Window;
 
 void WINDOW_CreateWindow(Window* new, int x, int y, int w, int h, void (*draw)(Window* self), void (*handle)(Window* self, WindowEvent* evt));

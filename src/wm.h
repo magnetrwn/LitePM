@@ -20,7 +20,7 @@ enum WM_WDECORATION {
 };
 
 typedef struct {
-    Window* windows[WM_MAX_WINDOWS];
+    Window* windows[WM_MAX_WINDOWS]; // NOTE: very important to keep the windows ordered by z-index
     enum WM_WDECORATION decoration[WM_MAX_WINDOWS];
     enum WM_WSTATE state[WM_MAX_WINDOWS];
     int count, idx_focused;
@@ -35,6 +35,7 @@ void WM_RemoveWindow(WM* self, Window* window);
 void WM_SetWindowState(WM* self, Window* window, enum WM_WSTATE state);
 void WM_SetWindowDecoration(WM* self, Window* window, enum WM_WDECORATION decoration);
 void WM_FocusWindow(WM* self, Window* window);
+void WM_UnfocusWindow(WM* self);
 
 Window** WM_GetWindowArray(WM* self);
 int WM_GetWindowCount(WM* self);

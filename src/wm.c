@@ -1,5 +1,5 @@
 #include "wm.h"
-#include <stdlib.h>
+#include <stddef.h>
 
 void WM_CreateWM(WM* new) {
     new->count = 0;
@@ -17,10 +17,8 @@ void WM_CreateWM(WM* new) {
 
 void WM_DestroyWM(WM* self) {
     for (int i = 0; i < self->count; ++i)
-        if (self->windows[i]) {
-            //WINDOW_DestroyWindow(self->windows[i]); // NOTE: don't destroy the window here, it could be reused and it's not WM responsibility
+        if (self->windows[i])
             self->windows[i] = NULL;
-        }
 
     self->count = 0;
 }
@@ -35,15 +33,22 @@ void WM_AddWindow(WM* self, Window* new, enum WM_WDECORATION decoration) {
 }
 
 void WM_RemoveWindow(WM* self, Window* window) {
+    if (self->windows[self->count - 1] == window) {
+        self->windows[self->count - 1] = NULL;
+        --self->count;
+        return;
+    }
+
     for (int i = 0; i < self->count; ++i)
         if (self->windows[i] == window) {
-            //WINDOW_DestroyWindow(window); // NOTE: don't destroy the window here, it could be reused and it's not WM responsibility
-            self->windows[i] = NULL;
+
             for (int j = i; j < self->count - 1; ++j) {
                 self->windows[j] = self->windows[j + 1];
                 self->decoration[j] = self->decoration[j + 1];
                 self->state[j] = self->state[j + 1];
             }
+            
+            self->windows[self->count - 1] = NULL;
             --self->count;
             break;
         }
@@ -70,14 +75,46 @@ void WM_SetWindowDecoration(WM* self, Window* window, enum WM_WDECORATION decora
 }
 
 void WM_FocusWindow(WM* self, Window* window) {
-    for (int i = 0; i < self->count; ++i)
+    if (self->idx_focused != -1 && self->windows[self->idx_focused] == window)
+        return;
+
+    Window* to_focus_window = NULL;
+    enum WM_WDECORATION to_focus_decoration = WM_WINDOW_DECORATION_NONE;
+
+    if (self->idx_focused != -1)
+        self->state[self->idx_focused] = WINDOW_STATE_VISIBLE;
+
+    if (self->windows[self->count - 1] == window) {
+        self->idx_focused = self->count - 1;
+        self->state[self->idx_focused] = WINDOW_STATE_FOCUSED;
+        return;
+    }
+
+    for (int i = 0; i < self->count - 1; ++i) {
         if (self->windows[i] == window) {
-            if (self->idx_focused != -1)
-                self->state[self->idx_focused] = WINDOW_STATE_VISIBLE;
-            self->state[i] = WINDOW_STATE_FOCUSED;
-            self->idx_focused = i;
+            to_focus_window = self->windows[i];
+            to_focus_decoration = self->decoration[i];
+            
+            for (int j = i; j < self->count - 1; ++j) {
+                self->windows[j] = self->windows[j + 1];
+                self->decoration[j] = self->decoration[j + 1];
+                self->state[j] = self->state[j + 1];
+            }
+            
+            self->windows[self->count - 1] = to_focus_window;
+            self->decoration[self->count - 1] = to_focus_decoration;
+            self->state[self->count - 1] = WINDOW_STATE_FOCUSED;
+            self->idx_focused = self->count - 1;
             break;
         }
+    }
+}
+
+void WM_UnfocusWindow(WM* self) {
+    if (self->idx_focused != -1)
+        self->state[self->idx_focused] = WINDOW_STATE_VISIBLE;
+    
+    self->idx_focused = -1;
 }
 
 Window** WM_GetWindowArray(WM* self) { return self->windows; }
@@ -90,8 +127,10 @@ Window* WM_GetWindowAt(WM* self, int x, int y) {
             int gy = self->windows[i]->y;
             int gw = self->windows[i]->w;
             int gh = self->windows[i]->h;
+
             if (x >= gx && x < gx + gw && y >= gy && y < gy + gh)
                 return self->windows[i];
         }
+
     return NULL;
 }
